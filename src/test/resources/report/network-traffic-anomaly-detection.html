@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+<body>
+<h1 style="text-align: center;">Network Traffic Anomaly Detection</h1>
+<canvas id="networkTrafficAnomalyDetectionChart" style="width:100%"></canvas>
+
+<script>
+fetch('./network-traffic-anomaly-detection.json')
+  .then(response => response.json())
+  .then(networkTrafficAnomalyDetection => {
+      const networkTrafficAnomalyDetectionXAxis = networkTrafficAnomalyDetection.networkTrafficAggregate.map(element => element.xaxis);
+      const networkTrafficAnomalyDetectionData = new Map(networkTrafficAnomalyDetection.networkTrafficAnomalyDetection.map(element => { return [element.xaxis, element.yaxis]; }));
+      new Chart("networkTrafficAnomalyDetectionChart", {
+          type: "line",
+          data: {
+            labels: networkTrafficAnomalyDetectionXAxis.map(element => new Date(element).toLocaleTimeString()),
+            datasets: [{
+              label: "Network Traffic Aggregate",
+              fill: false,
+              lineTension: 0.5,
+              backgroundColor: "rgba(0, 0, 0, 1.0)",
+              borderColor: "rgba(0, 0, 0, 1.0)",
+              pointRadius: 1,
+              data: networkTrafficAnomalyDetection.networkTrafficAggregate.map(element => element.yaxis)
+            },{
+              label: "Network Traffic Aggregate Prediction",
+              fill: false,
+              borderDash: [10, 10],
+              lineTension: 0.5,
+              backgroundColor: "rgba(0,255,0,1.0)",
+              borderColor: "rgba(0,255,0,1.0)",
+              pointRadius: 1,
+              data: networkTrafficAnomalyDetection.networkTrafficAggregatePrediction.map(element => element.yaxis)
+            },{
+              label: "Network Traffic Anomaly Detection",
+              fill: false,
+              lineTension: 0.5,
+              backgroundColor: "rgba(255,0,0,0.0)",
+              borderColor: "rgba(255,0,0,0.0)",
+              pointBackgroundColor: "rgba(255,0,0,0.5)",
+              pointBorderColor: "rgba(255,0,0,1.0)",
+              pointRadius: 10,
+              pointHoverRadius: 15,
+              data: networkTrafficAnomalyDetectionXAxis.map(element => {
+                console.log(element);
+                if (networkTrafficAnomalyDetectionData.has(element)) {
+                    return networkTrafficAnomalyDetectionData.get(element);
+                } else {
+                    return null;
+                }
+              })
+            }]
+          },
+          options: {
+            legend: {display: true}
+          }
+    });
+  })
+  .catch(error => console.log(error));
+</script>
+
+</body>
+</html>
+
+

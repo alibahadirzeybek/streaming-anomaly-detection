@@ -1,0 +1,4 @@
+.idea
+.DS_Store
+target/
+src/test/resources/report/network-traffic-anomaly-detection.json
